@@ -9,7 +9,7 @@ O objetivo final do algoritmo é: dada uma matriz de números naturais aleatóri
 *   De modo serial, ou seja, a contagem dos primos será feita um a um, um após o outro. Esse será o seu tempo de referência.
 *   De modo paralelo. Para tanto, o trabalho de verificar cada número e se for primo contabilizá-lo consistirá na subdivisão da matriz em "macroblocos" (submatrizes), sem qualquer cópia, baseando-se apenas nos índices. Como no exemplo abaixo:
 
-![matriz 9x9](https://image.prntscr.com/image/STePlBe0T6a0KzH4-A4iTg.png)
+![matriz 9x9](https://image.prntscr.com/image/PuzmrpF-TRWpsm-uC7Oekg.png)
 
 *   Ou seja, a matriz acima é 9 x 9 e cada macrobloco é composto por 9 elementos. O macrobloco 1 vai da coluna 0 a 2 e da linha 0 a 2, e assim sucessivamente. Os macroblocos serão as unidades de trabalho de cada thread. Atenção: Nem a matriz nem os macroblocos deverão ser obrigatoriamente quadradas. A única exigência é que todos os macroblocos tenham o mesmo tamanho. Além disso, você deve encontrar alguma forma de PARAMETRIZAR essa divisão (usando a diretiva #define, por exemplo) a fim de poder efetuar os testes para diferentes tamanhos de macroblocos. Os macroblocos terão tamanhos que podem variar de desde um único elemento até a matriz toda (equivalente ao caso serial).
 
