@@ -38,4 +38,4 @@ Alguns testes realmente interessantes que enriquecerão seu trabalho e aprofunda
 
 ## CONCLUSÃO
 Pronto, chegou a hora de você responder da maneira mais abrangente possível a simples questão:
-    **O que você pode aprender com esse trabalho?**
+*   **O que você pode aprender com esse trabalho?**
