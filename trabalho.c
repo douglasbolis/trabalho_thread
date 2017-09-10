@@ -4,16 +4,19 @@
  * Copyright 2017 Douglas <douglasbolislima@gmail.com>
  */
 #include <stdio.h>
-#include <math.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 
 /**
  * Características da matriz
  */
-#define TAMLINHA 20000
-#define TAMCOLUNA 20000
-#define MAXRANDOM 29999
+// #define TAMLINHA 20000
+// #define TAMCOLUNA 20000
+// #define MAXRANDOM 29999
+#define TAMLINHA 5
+#define TAMCOLUNA 5
+#define MAXRANDOM 100
 
 unsigned int countPrime = 0;
 
@@ -41,6 +44,9 @@ int main( int argc, char **argv ) {
     /** adicionando números aleatórios */
     fillMatriz( matriz, lengthLine, lengthColumn );
 
+    /** Imprimindo matriz */
+    printMatriz( matriz, lengthLine, lengthColumn );
+
     /** BUSCA SERIAL */
     serialSearch( matriz, lengthLine, lengthColumn);
     printf( "\nBUSCA SERIAL\nNúmeros primos encontrados na matriz: %u\n", countPrime );
@@ -62,18 +68,18 @@ int** createMatriz( int line, int column ) {
   return matriz;
 }
 
-void fillMatriz( int **matriz, line, column ) {
+void fillMatriz( int **matriz, int line, int column ) {
   int i, j;
 
+  srand( ( unsigned )time( NULL ) );
   for( i = 0; i < line; i++ ) {
-    srand( clock() );
     for( j = 0; j < column; j++ ) {
-      matriz[ i ][ j ] = rand() %MAXRANDOM;
+      matriz[ i ][ j ] = rand() % ( MAXRANDOM + 1 ) /** +1 para que o número máximo definido seja gerado. */;
     }
   }
 }
 
-void serialSearch(, int **matriz, int line, int column ) {
+void serialSearch( int **matriz, int line, int column ) {
   int i, j;
 
   for( i = 0; i < line; i++ ) {
