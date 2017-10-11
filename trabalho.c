@@ -34,27 +34,27 @@ void freeMatriz( int**, int );
  * Método principal
  */
 int main( int argc, char **argv ) {
-    int **matriz;
-    int lengthLine = TAMLINHA;
-    int lengthColumn = TAMCOLUNA;
+  int **matriz;
+  int lengthLine = TAMLINHA;
+  int lengthColumn = TAMCOLUNA;
 
-    /** criando a matriz */
-    matriz = createMatriz( lengthLine, lengthColumn );
+  /** criando a matriz */
+  matriz = createMatriz( lengthLine, lengthColumn );
 
-    /** adicionando números aleatórios */
-    fillMatriz( matriz, lengthLine, lengthColumn );
+  /** adicionando números aleatórios */
+  fillMatriz( matriz, lengthLine, lengthColumn );
 
-    /** Imprimindo matriz */
-    printMatriz( matriz, lengthLine, lengthColumn );
+  /** Imprimindo matriz */
+  printMatriz( matriz, lengthLine, lengthColumn );
 
-    /** BUSCA SERIAL */
-    serialSearch( matriz, lengthLine, lengthColumn);
-    printf( "\nBUSCA SERIAL\nNúmeros primos encontrados na matriz: %u\n", countPrime );
-    /** FIM BUSCA SERIAL */
+  /** BUSCA SERIAL */
+  serialSearch( matriz, lengthLine, lengthColumn);
+  printf( "\nBUSCA SERIAL\nNúmeros primos encontrados na matriz: %u\n", countPrime );
+  /** FIM BUSCA SERIAL */
 
-    /** Libera espaço alocado para a matriz */
-    freeMatriz( matriz, lengthLine );
-    return 0;
+  /** Libera espaço alocado para a matriz */
+  freeMatriz( matriz, lengthLine );
+  return 0;
 }
 
 int** createMatriz( int line, int column ) {
