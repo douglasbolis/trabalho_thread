@@ -8,7 +8,7 @@
       "type": "shell",
       "command": "gcc",
       "args": [
-        "trabalho.c", "-o", "trabalho.o"
+        "trabalho.c", "-o", "trabalho.o", "-lm"
       ],
       "group": {
         "kind": "build",
