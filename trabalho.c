@@ -79,7 +79,7 @@ int main( int argc, char **argv ) {
  */
 int** createMatrix( int line, int column ) {
   int i;
-  int **matrix = malloc( line * sizeof( unsigned long ) );
+  int **matrix = malloc( line * sizeof( unsigned int ) );
 
   for( i = 0; i < line; i++ ) {
     matrix[ i ] = malloc( column * sizeof( int ) );
