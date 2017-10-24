@@ -1,7 +1,10 @@
 /**
  * trabalho.c
- *
- * Copyright 2017 Douglas <douglasbolislima@gmail.com>
+ * Purpose: Calcular a quantidade de números primos em uma determinada matriz de forma serial e paralela.
+ * Na busca de forma paralela a matriz deverá ser dividida em novas matrizes para a busca ser efetuada.
+ * 
+ * @author Douglas Bolis Lima <douglasbolislima@gmail.com>
+ * @version 0.3.0 24/10/2017
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,7 +12,7 @@
 #include <math.h>
 
 /**
- * Características da matriz
+ * Características da matriz.
  */
 // #define TAMLINHA 20000
 // #define TAMCOLUNA 20000
@@ -23,15 +26,25 @@ unsigned int countPrime = 0;
 /**
  * Assinatura dos métodos.
  */
+// Verifica se o número é primo.
 int isPrime( int );
+// Cria e retorna uma matriz.
 int** createMatrix( int, int );
+// Preenche a matriz com números aleatório de 0 até MAXRANDOM.
 void fillMatrix( int**, int, int );
+// Imprime os elementos da matriz.
 void printMatrix( int**, int, int );
+// Faz a busca serial na matriz.
 void serialSearch( int**, int, int );
+// Libera o espaço alocado para a matriz
 void freeMatrix( int**, int );
 
 /**
  * Método principal.
+ *
+ * @param argc Número de argumentos.
+ * @param argv Ponteiro para a lista de argumentos.
+ * @return Retorna o código indicativo se o programa foi executado corretamente.
  */
 int main( int argc, char **argv ) {
     int **matrix;
@@ -57,6 +70,13 @@ int main( int argc, char **argv ) {
     return 0;
 }
 
+/**
+ * Cria e retorna uma matriz.
+ *
+ * @param line Número de linhas da matriz.
+ * @param column Número de colunas da matriz.
+ * @return Ponteiro para a matriz criada.
+ */
 int** createMatrix( int line, int column ) {
   int i;
   int **matrix = malloc( line * sizeof( unsigned long ) );
@@ -68,18 +88,36 @@ int** createMatrix( int line, int column ) {
   return matrix;
 }
 
+/**
+ * Preenche a matriz com números aleatório de 0 até MAXRANDOM.
+ *
+ * @param matrix Ponteiro da matriz.
+ * @param line Número de linhas que a matriz possui.
+ * @param column Número de colunas que a matriz possui.
+ * @return Método sem retorno.
+ */
 void fillMatrix( int **matrix, int line, int column ) {
   int i, j;
 
   srand( ( unsigned )time( NULL ) );
   for( i = 0; i < line; i++ ) {
     for( j = 0; j < column; j++ ) {
-       /** ( MAXRANDOM + 1 ) para que o número máximo definido também possa ser gerado. */
+       /**
+        * ( MAXRANDOM + 1 ) para que o número máximo definido também possa ser gerado.
+        */
       matrix[ i ][ j ] = rand() % ( MAXRANDOM + 1 );
     }
   }
 }
 
+/**
+ * Faz a busca serial na matriz.
+ *
+ * @param matrix Ponteiro da matriz.
+ * @param line Número de linhas que a matriz possui.
+ * @param column Número de colunas que a matriz possui.
+ * @return Método sem retorno.
+ */
 void serialSearch( int **matrix, int line, int column ) {
   int i, j;
 
@@ -90,6 +128,13 @@ void serialSearch( int **matrix, int line, int column ) {
   }
 }
 
+
+/**
+ * Verifica se o número é primo.
+ *
+ * @param n Número a ser verificado.
+ * @return O indicativo do número ser primo.
+ */
 int isPrime( int n ) {
   double limit;
   int i = 3, control = 1;
@@ -110,6 +155,14 @@ int isPrime( int n ) {
   }
 }
 
+/**
+ * Imprime os elementos da matriz.
+ *
+ * @param matrix Ponteiro da matriz.
+ * @param line Número de linhas que a matriz possui.
+ * @param column Número de colunas que a matriz possui.
+ * @return Método sem retorno.
+ */
 void printMatrix( int **matrix, int line, int column ) {
   int i, j;
 
@@ -121,6 +174,13 @@ void printMatrix( int **matrix, int line, int column ) {
   }
 }
 
+/**
+ * Libera o espaço alocado para a matriz.
+ *
+ * @param matrix Ponteiro da matriz.
+ * @param line Número de linhas que a matriz possui.
+ * @return Método sem retorno.
+ */
 void freeMatrix( int **matrix, int line ) {
   int i;
   for ( i = 0; i < line; i++ ) {
