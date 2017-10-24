@@ -21,70 +21,71 @@
 unsigned int countPrime = 0;
 
 /**
- * Assinatura dos métodos
+ * Assinatura dos métodos.
  */
-int** createMatriz( int, int );
 int isPrime( int );
-void fillMatriz( int**, int, int );
-void printMatriz( int**, int, int );
+int** createMatrix( int, int );
+void fillMatrix( int**, int, int );
+void printMatrix( int**, int, int );
 void serialSearch( int**, int, int );
-void freeMatriz( int**, int );
+void freeMatrix( int**, int );
 
 /**
- * Método principal
+ * Método principal.
  */
 int main( int argc, char **argv ) {
-  int **matriz;
-  int lengthLine = TAMLINHA;
-  int lengthColumn = TAMCOLUNA;
+    int **matrix;
+    int lengthLine = TAMLINHA;
+    int lengthColumn = TAMCOLUNA;
 
-  /** criando a matriz */
-  matriz = createMatriz( lengthLine, lengthColumn );
+    /** criando a matriz */
+    matrix = createMatrix( lengthLine, lengthColumn );
 
-  /** adicionando números aleatórios */
-  fillMatriz( matriz, lengthLine, lengthColumn );
+    /** adicionando números aleatórios */
+    fillMatrix( matrix, lengthLine, lengthColumn );
 
-  /** Imprimindo matriz */
-  printMatriz( matriz, lengthLine, lengthColumn );
+    /** Imprimindo matriz */
+    printMatrix( matrix, lengthLine, lengthColumn );
 
-  /** BUSCA SERIAL */
-  serialSearch( matriz, lengthLine, lengthColumn);
-  printf( "\nBUSCA SERIAL\nNúmeros primos encontrados na matriz: %u\n", countPrime );
-  /** FIM BUSCA SERIAL */
+    /** BUSCA SERIAL */
+    serialSearch( matrix, lengthLine, lengthColumn);
+    printf( "\nBUSCA SERIAL\nNúmeros primos encontrados na matriz: %u\n", countPrime );
+    /** FIM BUSCA SERIAL */
 
-  /** Libera espaço alocado para a matriz */
-  freeMatriz( matriz, lengthLine );
-  return 0;
+    /** Libera espaço alocado para a matriz */
+    freeMatrix( matrix, lengthLine );
+    return 0;
 }
 
-int** createMatriz( int line, int column ) {
+int** createMatrix( int line, int column ) {
   int i;
-  int **matriz = malloc( line * sizeof( unsigned long ) );
+  int **matrix = malloc( line * sizeof( unsigned long ) );
 
   for( i = 0; i < line; i++ ) {
-    matriz[ i ] = malloc( column * sizeof( int ) );
+    matrix[ i ] = malloc( column * sizeof( int ) );
   }
 
-  return matriz;
+  return matrix;
 }
 
-void fillMatriz( int **matriz, int line, int column ) {
+void fillMatrix( int **matrix, int line, int column ) {
   int i, j;
 
   srand( ( unsigned )time( NULL ) );
   for( i = 0; i < line; i++ ) {
     for( j = 0; j < column; j++ ) {
-      matriz[ i ][ j ] = rand() % ( MAXRANDOM + 1 ) /** +1 para que o número máximo definido seja gerado. */;
+       /** ( MAXRANDOM + 1 ) para que o número máximo definido também possa ser gerado. */
+      matrix[ i ][ j ] = rand() % ( MAXRANDOM + 1 );
     }
   }
 }
 
-void serialSearch( int **matriz, int line, int column ) {
+void serialSearch( int **matrix, int line, int column ) {
   int i, j;
 
   for( i = 0; i < line; i++ ) {
     for( j = 0; j < column; j++ ) {
-      countPrime += isPrime( matriz[ i ][ j ] );
+      countPrime += isPrime( matrix[ i ][ j ] );
     }
   }
 }
@@ -109,21 +110,21 @@ int isPrime( int n ) {
   }
 }
 
-void printMatriz( int **matriz, int line, int column ) {
+void printMatrix( int **matrix, int line, int column ) {
   int i, j;
 
   for( i = 0; i < line; i++ ) {
     for( j = 0; j < column; j++ ) {
-      printf( " %5d ", matriz[ i ][ j ] );
+      printf( " %5d ", matrix[ i ][ j ] );
     }
     printf( "\n" );
   }
 }
 
-void freeMatriz( int **matriz, int line ) {
+void freeMatrix( int **matrix, int line ) {
   int i;
   for ( i = 0; i < line; i++ ) {
-    free( matriz[ i ] );
+    free( matrix[ i ] );
   }
-  free( matriz );
+  free( matrix );
 }
