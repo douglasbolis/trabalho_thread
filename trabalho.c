@@ -177,10 +177,10 @@ void serialSearch() {
  * Método de execução da thread.
  * Quando a thread é criada e iniciada, a thread executará este método.
  *
- * @param {void*} threadId Dados que a thread pode acessar que não sejam globais.
+ * @param {void*} nothing Dados que a thread pode acessar que não sejam globais.
  * @return {void} Método sem retorno.
  */
-void *parallelSearch( void *threadId ) {
+void *parallelSearch( void *nothing ) {
 	Macrobloco macrobloco;
 	int i = 0, j = 0, endThread = FALSE, _primeNumberCounter = 0;
 
