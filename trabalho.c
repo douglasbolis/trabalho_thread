@@ -4,7 +4,7 @@
  * Na busca de forma paralela a matriz deverá ser dividida em novas matrizes para a busca ser efetuada.
  * 
  * @author Douglas Bolis Lima <douglasbolislima@gmail.com>
- * @version 0.3.4 17/11/2017
+ * @version 0.3.5 17/11/2017
  */
 #include <stdio.h>
 #include <stdlib.h>
