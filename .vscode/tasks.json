@@ -4,11 +4,23 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "taskName": "Compilando o trabalho",
+      "label": "Compilando o trabalho",
       "type": "shell",
       "command": "gcc",
       "args": [
-        "trabalho.c", "-o", "trabalho.o", "-lm"
+        "trabalho.c", "-o", "trabalho.o", "-lm",  "-lpthread"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Compilando os exemplos do professor",
+      "type": "shell",
+      "command": "gcc",
+      "args": [
+        "pthreads_exemplos.c", "-o", "exemplo.o", "-lm",  "-lpthread"
       ],
       "group": {
         "kind": "build",

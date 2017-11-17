@@ -1,4 +1,4 @@
-#pragma once
+// #pragma once
 #define _CRT_SECURE_NO_WARNINGS 1 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS 1 
 
@@ -14,16 +14,16 @@ int main()
     pthread_t tid;  // Estrutura que define uma thread
     printf("Hello World da thread principal!\n");
     
-	// Cria uma thread com os atributos definidos em tid, opções padrão NULL,
-	// thread é função que contém o código da thread e não há parametros de entrada (ou seja, NULL)
+	// Cria uma thread com os atributos definidos em tid, opï¿½ï¿½es padrï¿½o NULL,
+	// thread ï¿½ funï¿½ï¿½o que contï¿½m o cï¿½digo da thread e nï¿½o hï¿½ parametros de entrada (ou seja, NULL)
 	pthread_create(&tid, NULL, thread, NULL); 
 
-	// Espera a thread "tid" terminar e não captura seu valor de retorno retorno (NULL)
+	// Espera a thread "tid" terminar e nï¿½o captura seu valor de retorno retorno (NULL)
     pthread_join(tid, NULL);
 
-	system("pause");
+	// system("pause");
 
-	// Retorno NULL da thread principal. Desnecessário.
+	// Retorno NULL da thread principal. Desnecessï¿½rio.
     pthread_exit((void *)NULL);
 
 	
@@ -37,7 +37,7 @@ void *thread(void *vargp)
 // --- Fim Exemplo 1 ---
 
 
-//// Exemplo 2: Escopo de variáveis
+//// Exemplo 2: Escopo de variï¿½veis
 //#include <stdio.h>
 //#include <stdlib.h>
 //#include <pthread.h>
@@ -53,7 +53,7 @@ void *thread(void *vargp)
 //	pthread_create(&tid, NULL, thr_func, NULL);
 //	pthread_join(tid, NULL);
 //	printf("Thread principal: %d\n", global);
-//	system("pause");
+// //	system("pause");
 //	return 0;
 //}
 //
@@ -65,7 +65,7 @@ void *thread(void *vargp)
 //}
 //// --- Fim Exemplo 2 ---
 
-//// --- Exemplo 3: Multiplas Threads com parâmetro
+//// --- Exemplo 3: Multiplas Threads com parï¿½metro
 //#include <stdio.h>
 //#include <stdlib.h>
 //#include <pthread.h>
@@ -95,7 +95,7 @@ void *thread(void *vargp)
 //		} 
 //	} 
 //
-//	system("pause");
+// //	system("pause");
 //
 //	pthread_exit(NULL); 
 //}  
@@ -112,7 +112,7 @@ void *thread(void *vargp)
 //int a[TAM];
 //int global_index = 0;
 //int sum = 0;
-//pthread_mutex_t mutex1; // Declaração do mutex
+//pthread_mutex_t mutex1; // Declaraï¿½ï¿½o do mutex
 //
 //void *slave (void *nenhum)
 //{
@@ -162,6 +162,6 @@ void *thread(void *vargp)
 //
 //	printf("A soma eh %d \n", sum);
 //
-//	system("pause");
+// //	system("pause");
 //}
 //// --- Fim do Exemplo 4 ---
