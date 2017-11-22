@@ -2,9 +2,8 @@
  * trabalho.c
  * Purpose: Calcular a quantidade de números primos em uma determinada matriz de forma serial e paralela.
  * Na busca de forma paralela a matriz deverá ser dividida em novas matrizes para a busca ser efetuada.
- * 
- * @author Douglas Bolis Lima <douglasbolislima@gmail.com>
- * @version 0.3.5 17/11/2017
+ *
+ * @version 0.3.6 22/11/2017
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,18 +17,23 @@
 /**
  * Características da matriz.
  */
-// #define TAM_LINHA 15000
-// #define TAM_COLUNA 15000
-// #define MAX_RANDOM 29999
-#define TAM_LINHA 9
-#define TAM_COLUNA 9
-#define MAX_RANDOM 19
+#define TAM_LINHA 15000
+#define TAM_COLUNA 15000
+#define MAX_RANDOM 29999
+// #define TAM_LINHA 9
+// #define TAM_COLUNA 9
+// #define MAX_RANDOM 19
+/**
+ * Seed para gerar os números randômicos.
+ */
+#define SEED 7
+// #define SEED ( unsigned )time( NULL )
 /**
  * Características dos macroblocos.
  */
 #define NUM_THREADS 4
-#define NUM_MB_LINES 3
-#define NUM_MB_COLUMNS 3
+#define NUM_MB_LINES 150
+#define NUM_MB_COLUMNS 150
 
 /**
  * Estrutura dos structs.
@@ -50,6 +54,7 @@ typedef struct {
 Matriz *matriz;
 Macrobloco *macrobloco;
 unsigned int primeNumberCounter = 0;
+unsigned int primeNumberCounterParallel = 0;
 unsigned int gerenciadorMacrobloco = 0;
 unsigned int macroblocoCounter = 0;
 pthread_mutex_t mutexMacrobloco;
@@ -59,21 +64,25 @@ pthread_mutex_t mutexPrimeNumber;
  * Assinatura dos métodos.
  */
 // Verifica se o número é primo.
-int isPrime( int );
+unsigned int isPrime( int );
 // Cria e retorna uma matriz.
 Matriz* createMatriz( int, int );
 // Preenche a matriz com números aleatório de 0 até MAX_RANDOM.
 void fillMatriz();
 // Divide a matriz em macroblocos.
-Macrobloco* divideMatriz();
+Macrobloco* splitMatriz();
 // Imprime os elementos da matriz.
 void printMatriz();
-// Imprime os elementos do macrobloco.
-void printMacrobloco( Macrobloco );
-// Faz a busca serial na matriz.
+// Realiza a busca serial na matriz.
 void serialSearch();
+// Realiza a busca serial na matriz.
+void parallelSearch();
 // Faz a busca paralela na matriz.
-void *parallelSearch( void* );
+void *functionThread( void* );
+// Retorna um macrobloco disponível.
+void* findMacrobloco();
+// Imprime os elementos do macrobloco.
+void printMacrobloco( Macrobloco* );
 // Libera o espaço alocado para a matriz
 int freeMatriz();
 
@@ -85,47 +94,33 @@ int freeMatriz();
  * @return Retorna o código indicativo se o programa foi executado corretamente.
  */
 int main( int argc, char **argv ) {
-  int threadsCounter, responseCodeThread;
-	pthread_t threads[ NUM_THREADS ];
   // Iniciando os mutexes;
 	pthread_mutex_init( &mutexMacrobloco, NULL );
 	pthread_mutex_init( &mutexPrimeNumber, NULL );
 
-  /** criando a matriz */
+  // Preparando a matriz para a relalização das buscas.
+  // criando a matriz
   matriz = createMatriz( TAM_LINHA, TAM_COLUNA );
-
-  /** adicionando números aleatórios */
+  // adicionando números aleatórios
   fillMatriz();
 
-  /** Dividindo a matriz em macroblocos */
-  macrobloco = divideMatriz();
+  // Dividindo a matriz em macroblocos
+  macrobloco = splitMatriz();
 
-  /** Imprimindo matriz */
-  printMatriz();
+  // Imprimindo matriz
+  // printMatriz();
 
-  // /** INÍCIO BUSCA SERIAL */
-  // serialSearch();
-  // printf( "\nBUSCA SERIAL\nNúmeros primos encontrados na matriz: %u\n", primeNumberCounter );
-  // /** FIM BUSCA SERIAL */
+  // INÍCIO BUSCA SERIAL
+  serialSearch();
+  printf( "\nBUSCA SERIAL\nNúmeros primos encontrados na matriz: %u\n", primeNumberCounter );
+  // FIM BUSCA SERIAL
 
-  /** INÍCIO BUSCA PARALELA */
-  primeNumberCounter = 0;
-  // Criando as threads e inicializando-as para já executarem suas buscas.
-  for ( threadsCounter = 0; threadsCounter < NUM_THREADS; threadsCounter++ ) {
-    responseCodeThread = pthread_create( &threads[ threadsCounter ], NULL, &parallelSearch, NULL );
-    if ( responseCodeThread ) {
-      printf( "ERROR code is %d\n", responseCodeThread );
-      exit( -1 );
-    }
-  }
-  // Esperando que as threads finalizem as buscas.
-	for ( threadsCounter = 0; threadsCounter < NUM_THREADS; threadsCounter++ ) {
-    pthread_join( threads[ threadsCounter ], NULL );
-	}
-  printf( "\nBUSCA PARALELA\nNúmeros primos encontrados na matriz: %u\n", primeNumberCounter );
-  /** FIM BUSCA PARALELA */
+  // INÍCIO BUSCA PARALELA
+  parallelSearch();
+  printf( "\nBUSCA PARALELA\nNúmeros primos encontrados na matriz: %u\n", primeNumberCounterParallel );
+  // FIM BUSCA PARALELA
 
-  /** Libera espaço alocado para a matriz */
+  // Libera espaço alocado para a matriz
   freeMatriz();
   return 0;
 }
@@ -161,8 +156,7 @@ Matriz* createMatriz( int lines, int columns ) {
 void fillMatriz() {
   int i, j;
 
-  srand( 7 );
-  // srand( ( unsigned )time( NULL ) );
+  srand( SEED );
   for ( i = 0; i < matriz->lines; i++ ) {
     for ( j = 0; j < matriz->columns; j++ ) {
       /**
@@ -178,20 +172,20 @@ void fillMatriz() {
  *
  * @return {Macrobloco*} Ponteiro para o vetor de macroblocos criado.
  */
-Macrobloco* divideMatriz() {
+Macrobloco* splitMatriz() {
   Macrobloco *mb;
-  int ml, mc, i = 0;
+  int macroblocoLine, macroblocoColumn, macroblocoNumber = 0;
 
   macroblocoCounter = ( matriz->lines * matriz->columns ) / ( NUM_MB_LINES * NUM_MB_COLUMNS );
 
   mb = malloc( macroblocoCounter * sizeof( Macrobloco ) );
 	
-	for ( ml = 0; ml < matriz->lines; ml += NUM_MB_LINES ) {
-		for ( mc = 0; mc < matriz->columns; mc += NUM_MB_COLUMNS, i += 1 ) {
-			mb[ i ].startLine = ml;
-			mb[ i ].endLine = ml + NUM_MB_LINES;
-			mb[ i ].startColumn = mc;
-			mb[ i ].endColumn = mc + NUM_MB_COLUMNS;
+	for ( macroblocoLine = 0; macroblocoLine < matriz->lines; macroblocoLine += NUM_MB_LINES ) {
+		for ( macroblocoColumn = 0; macroblocoColumn < matriz->columns; macroblocoColumn += NUM_MB_COLUMNS, macroblocoNumber += 1 ) {
+			mb[ macroblocoNumber ].startLine = macroblocoLine;
+			mb[ macroblocoNumber ].endLine = macroblocoLine + NUM_MB_LINES;
+			mb[ macroblocoNumber ].startColumn = macroblocoColumn;
+			mb[ macroblocoNumber ].endColumn = macroblocoColumn + NUM_MB_COLUMNS;
 		}
   }
 
@@ -199,12 +193,13 @@ Macrobloco* divideMatriz() {
 }
 
 /**
- * Faz a busca serial na matriz.
+ * Realiza a busca serial na matriz.
  *
  * @return {void} Método sem retorno.
  */
 void serialSearch() {
   int i, j;
+
 
   for ( i = 0; i < matriz->lines; i++ ) {
     for ( j = 0; j < matriz->columns; j++ ) {
@@ -214,50 +209,68 @@ void serialSearch() {
 }
 
 /**
+ * Realiza a busca paralela na matriz.
+ *
+ * @return {void} Método sem retorno.
+ */
+void parallelSearch() {
+  int threadsCounter, responseCodeThread;
+	pthread_t threads[ NUM_THREADS ];
+
+  // Criando as threads e inicializando-as para já executarem suas buscas.
+  for ( threadsCounter = 0; threadsCounter < NUM_THREADS; threadsCounter++ ) {
+    responseCodeThread = pthread_create( &threads[ threadsCounter ], NULL, &functionThread, NULL );
+    if ( responseCodeThread ) {
+      printf( "ERROR code is %d\n", responseCodeThread );
+      exit( -1 );
+    }
+  }
+  // Esperando que as threads finalizem as buscas.
+	for ( threadsCounter = 0; threadsCounter < NUM_THREADS; threadsCounter++ ) {
+    pthread_join( threads[ threadsCounter ], NULL );
+	}
+}
+
+/**
  * Método de execução da thread.
  * Quando a thread é criada e iniciada, a thread executará este método.
  *
  * @param {void*} nothing Dados que a thread pode acessar que não sejam globais.
  * @return {void} Método sem retorno.
  */
-void *parallelSearch( void *nothing ) {
-	Macrobloco mb;
-	int i = 0, j = 0, endThread = FALSE, primeNumberCounterLocal;
+void *functionThread( void *nothing ) {
+	Macrobloco* mb;
+	int i, j;
+  unsigned int primeNumberCounterLocal;
 
 	while ( TRUE ) {
-		pthread_mutex_lock( &mutexMacrobloco );
     // Região crítica para a thread pegar um dos macroblocos disponíveis para a busca.
-    if ( gerenciadorMacrobloco >= macroblocoCounter ) {
-      endThread = TRUE;
-    } else {
-      mb = macrobloco[ gerenciadorMacrobloco ];
-      gerenciadorMacrobloco += 1;
-    }
-		pthread_mutex_unlock( &mutexMacrobloco );
+    pthread_mutex_lock( &mutexMacrobloco );
+    mb = ( Macrobloco* )findMacrobloco();
+    pthread_mutex_unlock( &mutexMacrobloco );
 
-		if ( endThread ) {
+		if ( mb == NULL ) {
       // Caso a thread não encontrar um macrobloco disponível ela será encerrada.
       pthread_exit( NULL );
     }
 
-    // Zerando contador de números primos local.
+    // printMacrobloco( mb );
+    // Zerando o contador local de números primos antes de percorrer o macrobloco.
     primeNumberCounterLocal = 0;
 
-    // printMacrobloco( mb );
-
 		//Verificando o macrobloco encontrado.
-		for ( i = mb.startLine; i < mb.endLine; i++ ) {
-			for ( j = mb.startColumn; j < mb.endColumn; j++ ) {
+		for ( i = mb->startLine; i < mb->endLine; i++ ) {
+			for ( j = mb->startColumn; j < mb->endColumn; j++ ) {
 				primeNumberCounterLocal += isPrime( matriz->data[ i ][ j ] );
 			}
     }
-		pthread_mutex_lock( &mutexPrimeNumber );
+
     // Região crítica para incrementar o contador de números primos global.
-		primeNumberCounter += primeNumberCounterLocal;
+		pthread_mutex_lock( &mutexPrimeNumber );
+    primeNumberCounterParallel += primeNumberCounterLocal;
 		pthread_mutex_unlock( &mutexPrimeNumber );
 	}
 }
-
 
 /**
  * Verifica se o número é primo.
@@ -265,7 +278,7 @@ void *parallelSearch( void *nothing ) {
  * @param {int} n Número a ser verificado.
  * @return {int} O indicativo do número ser primo.
  */
-int isPrime( int n ) {
+unsigned int isPrime( int n ) {
   double limit;
   int i = 3, control = 1;
 
@@ -304,19 +317,28 @@ void printMatriz() {
 }
 
 /**
+ * Encontra um macrobloco disponível.
+ *
+ * @return {void*} O macrobloco encontrado.
+ */
+void* findMacrobloco() {
+  return ( gerenciadorMacrobloco >= macroblocoCounter ) ? NULL : &macrobloco[ gerenciadorMacrobloco++ ];
+}
+
+/**
  * Imprime os elementos do macrobloco.
  *
  * @return {void} Método sem retorno.
  */
-void printMacrobloco( Macrobloco mb ) {
+void printMacrobloco( Macrobloco *mb ) {
   int i, j, primos = 0;
 
   printf( "MACROBLOCO %u X %u:\n\n", NUM_MB_LINES, NUM_MB_COLUMNS );
 
-  printf( "linhas: %u e %u\ncolunas: %u e %u\n", mb.startLine, mb.endLine, mb.startColumn, mb.endColumn );
+  printf( "linhas: %u e %u\ncolunas: %u e %u\n", mb->startLine, mb->endLine, mb->startColumn, mb->endColumn );
 
-  for ( i = mb.startLine; i < mb.endLine; i++ ) {
-    for ( j = mb.startColumn; j < mb.endColumn; j++ ) {
+  for ( i = mb->startLine; i < mb->endLine; i++ ) {
+    for ( j = mb->startColumn; j < mb->endColumn; j++ ) {
       primos += isPrime( matriz->data[ i ][ j ] );
       printf( " %5d ", matriz->data[ i ][ j ] );
     }
@@ -338,6 +360,7 @@ int freeMatriz() {
   }
   free( matriz->data );
   free( matriz );
+  free( macrobloco );
 
   return 1;
 }
