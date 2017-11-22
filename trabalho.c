@@ -2,9 +2,8 @@
  * trabalho.c
  * Purpose: Calcular a quantidade de números primos em uma determinada matriz de forma serial e paralela.
  * Na busca de forma paralela a matriz deverá ser dividida em novas matrizes para a busca ser efetuada.
- * 
- * @author Douglas Bolis Lima <douglasbolislima@gmail.com>
- * @version 0.3.5 17/11/2017
+ *
+ * @version 0.3.6 22/11/2017
  */
 #include <stdio.h>
 #include <stdlib.h>
