@@ -8,19 +8,30 @@
       "type": "shell",
       "command": "gcc",
       "args": [
-        "trabalho.c", "-o", "trabalho.o", "-lm",  "-lpthread"
+        "trabalho.c",
+        "-o",
+        "trabalho.o",
+        "-lm",
+        "-lpthread"
       ],
       "group": {
         "kind": "build",
         "isDefault": true
-      }
+      },
+      "problemMatcher": [
+        "$gcc"
+      ]
     },
     {
       "label": "Compilando os exemplos do professor",
       "type": "shell",
       "command": "gcc",
       "args": [
-        "pthreads_exemplos.c", "-o", "exemplo.o", "-lm",  "-lpthread"
+        "pthreads_exemplos.c",
+        "-o",
+        "exemplo.o",
+        "-lm",
+        "-lpthread"
       ],
       "group": {
         "kind": "build",
